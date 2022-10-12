@@ -1,6 +1,7 @@
 # Remove created folders
 *
 
+# Exclude gitignore
 !.gitignore
 !main.sh
-!scripts
+!scripts/
