@@ -9,8 +9,8 @@ echo "  Downloading GENCODE toy data ..."
 echo "================================================================="
 
 cd data
-mkdir 3_gencode_toy
-cd 3_gencode_toy
+mkdir A_gencode_toy
+cd A_gencode_toy
 
 wget https://zenodo.org/record/7182809/files/biosurfer_gencode_toy_data.zip
 unzip biosurfer_gencode_toy_data.zip 
