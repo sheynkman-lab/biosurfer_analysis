@@ -3,7 +3,7 @@
 #Author: Mayank Murali
 #Project: Biosurfer
 
-#Script to doenload and install Biosufer from GitHub
+#Script to download and install Biosufer from GitHub
 
 # Clone the repository
 git clone -b dev --single-branch https://github.com/sheynkman-lab/biosurfer.git
