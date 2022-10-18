@@ -29,13 +29,10 @@ biosurfer load_db \
 mkdir ../B_hybrid_aln_results_toy
 biosurfer hybrid_alignment -d gencode_toy -o ../B_hybrid_aln_results_toy 
 
-# Step 6 - Create example visualization of isoforms using biosurfer
-biosurfer plot -d gencode_toy --gene CRYBG2
 
+## Steps from here until step 10 will be based on Jupyter notebook (ipynb) for plotting
 
-## Steps from here will be based on Jupyter notebook (ipynb) for plotting
-
-#Step 7 - Post-process hybrid alignment output table
+#Step 6 - Post-process hybrid alignment output table / genome wide analysis
 cd .. # cd out of biosurfer directory
 mkdir C_toy_plots
 
@@ -44,13 +41,46 @@ pip install xlsxwriter
 pip install openpyxl
 pip install plotly
 
-# If terminal command based
-ipython
-run ./scripts/hybrid_aln_table_processing.ipynb
+    # If terminal command based
+    ipython
+    run ./scripts/genome_wide_summary.ipynb
 
-#Else on ipynb through website (pip install notebook)
-jupyter notebook ./scripts/hybrid_aln_table_processing.ipynb
+    #Else on ipynb through website (pip install notebook)
+    jupyter notebook ./scripts/genome_wide_summary.ipynb
 
 
+# Step 7 - N-termini summary 
 
+mkdir D_nterm_plots
+
+    # If terminal command based
+    ipython
+    run ./scripts/n_termini_summary.ipynb
+
+    #Else on ipynb through website (pip install notebook)
+    jupyter notebook ./scripts/n_termini_summary.ipynb
+
+# Step 8 - C-termini summary
+mkdir E_cterm_plots
+
+    # If terminal command based
+    ipython
+    run ./scripts/c_termini_summary.ipynb
+
+    #Else on ipynb through website (pip install notebook)
+    jupyter notebook ./scripts/c_termini_summary.ipynb
+
+
+# Step 9 - Internal region summary
+mkdir F_internal_region_plots
+
+    # If terminal command based
+    ipython
+    run ./scripts/internal_region_summary.ipynb
+
+    #Else on ipynb through website (pip install notebook)
+    jupyter notebook ./scripts/internal_region_summary.ipynb
+
+# Step 10 - Isoform plot visualization using Biosurfer
+bash ./scripts/isoform_plotting.sh
 
