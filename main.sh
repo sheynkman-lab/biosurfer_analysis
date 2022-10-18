@@ -4,13 +4,20 @@
 
 # bash ./scripts/create_conda_env.sh
 conda create --name biosurfer-install --channel conda-forge python=3 pip 
-conda install graph-tool
 
 # Then activate the environment:
 conda activate biosurfer-install
 
+conda install --channel conda-forge graph-tool
+
 # Step 2 - install biosurfer (the stable dev-version)
-bash ./scripts/install_biosurfer.sh
+#bash ./scripts/install_biosurfer.sh
+
+    # Clone the repository
+    git clone -b dev --single-branch https://github.com/sheynkman-lab/biosurfer.git
+        
+    # Run setup 
+    pip install --editable biosurfer
 
 # Step 3 - download GENCODE toy data
 bash ./scripts/download_gencode_toy.sh 
@@ -27,7 +34,7 @@ biosurfer load_db \
 
 # Step 5 - Run biosurfer hybrid alignment on the toy dataset
 mkdir ../B_hybrid_aln_results_toy
-biosurfer hybrid_alignment -d gencode_toy -o ../B_hybrid_aln_results_toy 
+biosurfer hybrid_alignment -d gencode_toy -o ../B_hybrid_aln_results_toy --gencode
 
 
 ## Steps from here until step 10 will be based on Jupyter notebook (ipynb) for plotting
@@ -37,9 +44,7 @@ cd .. # cd out of biosurfer directory
 mkdir C_toy_plots
 
 #Install required libraries 
-pip install xlsxwriter
-pip install openpyxl
-pip install plotly
+pip install xlsxwriter openpyxl plotly
 
     # If terminal command based
     ipython
