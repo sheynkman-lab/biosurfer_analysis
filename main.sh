@@ -59,7 +59,7 @@ done
 mkdir C_toy_plots
 
 #Install required libraries 
-pip install xlsxwriter openpyxl plotly
+pip install ipykernel xlsxwriter openpyxl plotly
 
     # If terminal command based
     ipython
