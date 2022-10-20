@@ -1,4 +1,4 @@
-# %%
+# %% Importing libraries
 from pathlib import Path
 
 import matplotlib as mpl
@@ -10,9 +10,9 @@ import seaborn as sns
 
 from plot_config import PBLOCK_COLORS
 
-# %%
-for font_path in fm.findSystemFonts():
-    fm.fontManager.addfont(font_path)
+# %% Setting configurations for plotting
+# for font_path in fm.findSystemFonts():
+#     fm.fontManager.addfont(font_path)
 
 font = {
     'family': 'sans-serif',
@@ -22,15 +22,28 @@ font = {
 }
 mpl.rc('font', **font)
 
-# %%
-source = Path('../B_hybrid_aln_gencode_v42')
-output = Path('../D_altered_region_summary_plots')
+# %% Input, output paths
+source = Path('./B_hybrid_aln_gencode_v42')
+output = Path('./C_altered_region_summary_plots') #C
 output.mkdir(exist_ok=True)
 
+
+# # GENCODE toy
+# pblocks = pd.read_csv('../B_hybrid_aln_results_toy/pblocks.tsv', sep='\t')
+# # GENCODE v41
+# pblocks = pd.read_csv('../B_hybrid_aln_gencode_v41/pblocks.tsv', sep='\t')
+# # WTC11
+# pblocks = pd.read_csv('../B_hybrid_aln_wtc11/pblocks.tsv', sep='\t')
+# # GENCODE v42
+# pblocks = pd.read_csv('../B_hybrid_aln_gencode_v42/pblocks.tsv', sep='\t')
+# # WTC11 with gencode v42 APPRIS
+# pblocks = pd.read_csv('../B_hybrid_aln_wtc11_v42/pblocks.tsv', sep='\t')
+
+# Reading pblock csv file to dataframe
 pblocks = pd.read_csv(source/'pblocks.tsv', sep='\t', index_col=['other', 'pblock_number'])
 pblocks
 
-# %%
+# %% Plot 3A: Number of observed pblocks per alternative protein isoforms
 fig = plt.figure(figsize=(4, 2.4))
 ax = sns.histplot(
     x = pd.cut(
@@ -49,7 +62,7 @@ ax.set_ylim(0, 30000)
 ax.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
 fig.savefig(output/'altered-regions-per-isoform.png', dpi=200, facecolor=None, bbox_inches='tight')
 
-# %%
+# %% Plot 3B: Distribution of lengths of the insertion, deletion and substituion affected regions for proteins 
 aa_loss = pblocks[pblocks['pblock_category'].isin({'DELETION', 'SUBSTITUTION'})].reset_index()[['pblock_category', 'aa_loss']]
 aa_loss['pblock_category'].replace('SUBSTITUTION', 'SUBSTITUTION (reference)', inplace=True)
 aa_loss.rename(columns={'aa_loss': 'length'}, inplace=True)
@@ -85,11 +98,20 @@ for category, ax in facets.axes_dict.items():
 
 facets.fig.savefig(output/'altered-region-affected-lengths.png', dpi=200, facecolor=None, bbox_inches='tight')
 
-# %%
-pblock_per_isoform=pblocks.groupby(['anchor', 'other'])
-sns.scatterplot(data=pblocks[pblocks["pblock_category"]=="SUBSTITUTION"], x="aa_loss", y='aa_gain')
+# %% Plot 3C: Substitution scatter plot 
+sns.set_style("ticks")
+sns.axes_style("whitegrid")
+plt.figure(figsize=(4,4))
+sns.set_context("notebook", font_scale=1.0, rc={"lines.linewidth": 3})
+g = sns.scatterplot(data=pblocks[pblocks["pblock_category"]=="SUBSTITUTION"], x="aa_loss", y='aa_gain', facecolor='#FFD700', edgecolor='black', linewidth=0.1, alpha = 0.75, s=20)
+g.spines.right.set_visible(False)
+g.spines.top.set_visible(False)
+g.set(xlim=(0,1000),ylim=(0,2000))
+plt.ylabel("Reference", size=20)
+plt.xlabel("Alternative", size=20)
+plt.savefig(output/'reference-alternative-pblock-lengths-scatter-plot.png', dpi=200, facecolor=None, bbox_inches='tight')
 
-# %%
+# %% Pie chart
 category_counts = pblocks['pblock_category'].value_counts()
 fig = plt.figure()
 wedges, texts = plt.pie(
