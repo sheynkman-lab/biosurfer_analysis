@@ -40,13 +40,33 @@ aa_gain['pblock_category'].replace('SUBSTITUTION', 'SUBSTITUTION (alternative)',
 aa_gain.rename(columns={'aa_gain': 'length'}, inplace=True)
 affected_lengths = pd.concat([aa_loss, aa_gain])
 
-xmax = 500
+binwidth = 50
+xmax = 600
 
-# fig = plt.figure()
-facets = sns.displot(
-    data = affected_lengths[affected_lengths['length'] <= xmax],
+fig = plt.figure(figsize=(4.5, 2))
+data = affected_lengths[affected_lengths['pblock_category'] != 'SUBSTITUTION (alternative)']
+ax = sns.histplot(
+    data = data,
     x = 'length',
-    binwidth = 20,
+    binwidth = binwidth,
+    binrange = (0, xmax),
+    stat = 'count',
+    color = '#808080',
+    alpha = 1,
+)
+ax.set_xlabel('Length of altered region (amino acids)')
+ax.set_ylabel('Number of\naltered regions')
+ax.ticklabel_format(axis='y', style='sci', scilimits=(-1, 1))
+ax.vlines(data['length'].median(), *ax.get_ylim(), color='#b0b0b0', linestyle='-', linewidth=1)
+
+fig.savefig(output/'altered-region-affected-lengths.png', dpi=200, facecolor=None, bbox_inches='tight')
+
+# %%
+facets = sns.displot(
+    data = affected_lengths,
+    x = 'length',
+    binwidth = binwidth,
+    binrange = (0, xmax),
     stat = 'count',
     row = 'pblock_category',
     hue = 'pblock_category',
@@ -57,7 +77,6 @@ facets = sns.displot(
     height = 2,
     aspect = 2.5
 )
-# facets.set_titles('{row_name}')
 facets.set_xlabels('Length of altered region (amino acids)')
 facets.set_ylabels('Number of\naltered regions')
 for category, ax in facets.axes_dict.items():
@@ -65,17 +84,31 @@ for category, ax in facets.axes_dict.items():
     ax.ticklabel_format(axis='y', style='sci', scilimits=(-1, 1))
     ax.vlines(affected_lengths[affected_lengths['pblock_category'] == category]['length'].median(), *ax.get_ylim(), color='#808080', linestyle='-', linewidth=1)
 
-facets.fig.savefig(output/'altered-region-affected-lengths.png', dpi=200, facecolor=None, bbox_inches='tight')
+facets.fig.savefig(output/'altered-region-affected-lengths-categories.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 # %% Plot 3C: Substitution scatter plot 
-plt.figure(figsize=(4,4))
-g = sns.scatterplot(data=pblocks[pblocks["pblock_category"]=="SUBSTITUTION"], x="aa_loss", y='aa_gain', facecolor='#FFD700', edgecolor='black', linewidth=0.1, alpha = 0.75, s=20)
-g.spines.right.set_visible(False)
-g.spines.top.set_visible(False)
-g.set(xlim=(0,1000),ylim=(0,2000))
-plt.ylabel("Reference", size=20)
-plt.xlabel("Alternative", size=20)
-plt.savefig(output/'reference-alternative-pblock-lengths-scatter-plot.png', dpi=200, facecolor=None, bbox_inches='tight')
+plt.figure(figsize=(4.8, 3.6))
+ax = sns.histplot(
+    data = pblocks[pblocks['pblock_category'] == 'SUBSTITUTION'],
+    x = 'aa_loss',
+    y = 'aa_gain',
+    binwidth = binwidth/2,
+    stat = 'count',
+    color = PBLOCK_COLORS['SUBSTITUTION'],
+    legend = False,
+    cbar = True,
+    cbar_kws = {
+        'label': 'Number of regions',
+    },
+    alpha = 1,
+)
+# ax.spines.right.set_visible(False)
+# ax.spines.top.set_visible(False)
+ax.set_xlim(0, xmax)
+ax.set_ylim(0, xmax)
+ax.set_xlabel('Length of substitution region \nin reference isoform (AA)')
+ax.set_ylabel('Length of substitution region \nin alternative isoform (AA)')
+plt.savefig(output/'substitution-reference-alternative-lengths.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 # %% Pie chart
 category_counts = pblocks['pblock_category'].value_counts()
