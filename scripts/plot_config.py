@@ -48,6 +48,15 @@ NTERM_COLORS = dict(zip(
     color_palette('viridis_r', n_colors=len(NTERM_CLASSES)+1)[:-1]
 ))
 
+SPLICE_EVENT_COLORS = {
+    'Intron': '#EBA85F',
+    'Alt. donor': '#86BB6F',
+    'Alt. acceptor': '#A26FBB',
+    'Single exon': '#649FD2',
+    'Mutually exclusive exons': '#3674AF',
+    'Compound': '#888888'
+}
+
 # # GENCODE v42
 pblocks = pd.read_csv('../B_hybrid_aln_gencode_v42/pblocks.tsv', sep='\t')
 # # WTC11

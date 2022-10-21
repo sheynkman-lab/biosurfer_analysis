@@ -65,21 +65,20 @@ plt.savefig(output/'nterm-altTSS-counts.png', dpi=200, facecolor=None, bbox_inch
 
 # %%
 nterm_length_fig = plt.figure(figsize=(5, 2))
-ax = sns.violinplot(
+ax = sns.boxplot(
     data = nterm_pblocks,
     x = 'anchor_relative_length_change',
     y = 'nterm',
     order = ('Alternative initiation exon', 'Hybrid initiation exon'),
-    gridsize = 200,
     palette = NTERM_COLORS,
     saturation = 1,
-    scale = 'area',
+    fliersize = 2,
+    flierprops = {'marker': 'x'}
 )
 xmax = max(ax.get_xlim())
 ymin, ymax = ax.get_ylim()
-ax.vlines(x=0, ymin=ymin, ymax=ymax, color='#444444', linewidth=1, linestyle=':')
+ax.vlines(x=0, ymin=ymin, ymax=ymax, color='#808080', linewidth=1, linestyle='--')
 ax.set_xlim(-1, 1)
-ax.set_ylim(ymin, ymax)
 ax.set_xlabel('Change in N-terminal length\n(fraction of reference isoform length)')
 ax.set_ylabel(None)
 
