@@ -57,6 +57,14 @@ SPLICE_EVENT_COLORS = {
     'Compound': '#888888'
 }
 
+CTERM_CLASSES = {
+    'SPLICING' :  'splicing',
+    'FRAMESHIFT' : 'frameshift',
+}
+cterm_splice_palette = color_palette('RdPu_r', n_colors=3)
+cterm_frameshift_palette = color_palette('YlOrRd_r', n_colors=4)
+CTERM_PALETTE = [cterm_splice_palette[0], color_palette('YlOrRd_r', n_colors=4)[0]]
+
 # # GENCODE v42
 pblocks = pd.read_csv('../B_hybrid_aln_gencode_v42/pblocks.tsv', sep='\t')
 # # WTC11
