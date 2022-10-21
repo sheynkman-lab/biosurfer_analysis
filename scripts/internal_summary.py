@@ -89,12 +89,28 @@ internal_compound_subcats = pd.DataFrame(
             frozenset(sorted('DeA')),
         }),
         'Multi-exon inclusion': internal_compound_pblocks['events'] == frozenset('E'),
+        'Alt. donor + alt. acceptor': internal_compound_pblocks['events'].isin({
+            frozenset(sorted('ad')),
+            frozenset(sorted('Ad')),
+            frozenset(sorted('aD')),
+            frozenset(sorted('AD')),
+        }),
+        'Exon inclusion + \nalt. donor/acceptor': internal_compound_pblocks['events'].isin({
+            frozenset(sorted('dE')),
+            frozenset(sorted('DE')),
+            frozenset(sorted('Ea')),
+            frozenset(sorted('EA')),
+            frozenset(sorted('dEa')),
+            frozenset(sorted('DEa')),
+            frozenset(sorted('dEA')),
+            frozenset(sorted('DEA')),
+        }),
         'Other': [True for _ in internal_compound_pblocks.index]
     }
 )
 internal_compound_pblocks['compound_subcat'] = internal_compound_subcats.idxmax(axis=1).astype(pd.CategoricalDtype(internal_compound_subcats.columns, ordered=True))
 
-internal_pblocks_compound_fig = plt.figure(figsize=(4.2, 1.8))
+internal_pblocks_compound_fig = plt.figure(figsize=(3, 3))
 ax = sns.countplot(
         data = internal_compound_pblocks,
         y = 'compound_subcat',
@@ -102,7 +118,7 @@ ax = sns.countplot(
         saturation = 1,
         edgecolor = 'k',
 )
-ax.set_xlabel('Number of altered internal regions'),
+ax.set_xlabel('Number of altered\ninternal regions'),
 ax.set_ylabel(None)
 internal_pblocks_compound_fig.savefig(output/'internal-pblock-compound-events.png', dpi=200, facecolor=None, bbox_inches='tight')
 
