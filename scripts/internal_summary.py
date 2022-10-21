@@ -18,14 +18,17 @@ internal_pblocks = (
     drop(columns=[col for col in pblocks.columns if 'start' in col or 'stop' in col]).
     copy()
 )
+# convert string repr back to Python object
+internal_pblocks['tblock_events'] = internal_pblocks['tblock_events'].map(eval)
+internal_pblocks['events'] = internal_pblocks['events'].map(eval)  
 
 internal_subcats = pd.DataFrame(
     {
-        'Intron': internal_pblocks['tblock_events'].isin({"('I',)", "('i',)"}),
-        'Alt. donor': internal_pblocks['tblock_events'].isin({"('D',)", "('d',)"}),
-        'Alt. acceptor': internal_pblocks['tblock_events'].isin({"('A',)", "('a',)"}),
-        'Single exon': internal_pblocks['tblock_events'].isin({"('E',)", "('e',)"}),
-        'Mutually exclusive exons': internal_pblocks['tblock_events'].isin({"('E', 'e')", "('e', 'E')"}),
+        'Intron': internal_pblocks['tblock_events'].isin({('I',), ('i',)}),
+        'Alt. donor': internal_pblocks['tblock_events'].isin({('D',), ('d',)}),
+        'Alt. acceptor': internal_pblocks['tblock_events'].isin({('A',), ('a',)}),
+        'Single exon': internal_pblocks['tblock_events'].isin({('E',), ('e',)}),
+        'Mutually exclusive exons': internal_pblocks['tblock_events'].isin({('E', 'e'), ('e', 'E')}),
         'Compound': [True for _ in internal_pblocks.index]
     }
 )
@@ -74,18 +77,18 @@ internal_compound_pblocks = internal_pblocks[internal_pblocks['splice event'] ==
 
 internal_compound_subcats = pd.DataFrame(
     {
-        'Multi-exon skipping': internal_compound_pblocks['events'] == f"{frozenset('e')}",
+        'Multi-exon skipping': internal_compound_pblocks['events'] == frozenset('e'),
         'Exon skipping + \nalt. donor/acceptor': internal_compound_pblocks['events'].isin({
-            f"{frozenset('de')}",
-            f"{frozenset('De')}",
-            f"{frozenset('ea')}",
-            f"{frozenset('eA')}",
-            f"{frozenset('dea')}",
-            f"{frozenset('Dea')}",
-            f"{frozenset('deA')}",
-            f"{frozenset('DeA')}",
+            frozenset(sorted('de')),
+            frozenset(sorted('De')),
+            frozenset(sorted('ea')),
+            frozenset(sorted('eA')),
+            frozenset(sorted('dea')),
+            frozenset(sorted('Dea')),
+            frozenset(sorted('deA')),
+            frozenset(sorted('DeA')),
         }),
-        'Multi-exon inclusion': internal_compound_pblocks['events'] == f"{frozenset('E')}",
+        'Multi-exon inclusion': internal_compound_pblocks['events'] == frozenset('E'),
         'Other': [True for _ in internal_compound_pblocks.index]
     }
 )
