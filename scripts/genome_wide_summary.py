@@ -90,8 +90,8 @@ facets.fig.savefig(output/'altered-region-affected-lengths-categories.png', dpi=
 plt.figure(figsize=(4.8, 3.6))
 ax = sns.histplot(
     data = pblocks[pblocks['pblock_category'] == 'SUBSTITUTION'],
-    x = 'aa_loss',
-    y = 'aa_gain',
+    x = 'aa_gain',
+    y = 'aa_loss',
     binwidth = binwidth/2,
     stat = 'count',
     color = PBLOCK_COLORS['SUBSTITUTION'],
@@ -106,8 +106,8 @@ ax = sns.histplot(
 # ax.spines.top.set_visible(False)
 ax.set_xlim(0, xmax)
 ax.set_ylim(0, xmax)
-ax.set_xlabel('Length of substitution region \nin reference isoform (AA)')
-ax.set_ylabel('Length of substitution region \nin alternative isoform (AA)')
+ax.set_xlabel('Length of substitution region \nin alternative isoform (AA)')
+ax.set_ylabel('Length of substitution region \nin reference isoform (AA)')
 plt.savefig(output/'substitution-reference-alternative-lengths.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 # %% Pie chart
