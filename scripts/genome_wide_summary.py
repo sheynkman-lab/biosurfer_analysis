@@ -1,9 +1,11 @@
 # %% Importing libraries
 from pathlib import Path
+from re import M
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import numpy as np
 
 from plot_config import PBLOCK_COLORS, pblocks
 
@@ -20,6 +22,7 @@ ax = sns.histplot(
         right = False,
         labels = ['1', '2', '3', '4', '5+']
     ),
+    shrink = 0.75,
     color = '#888888',
     edgecolor = 'k',
     alpha = 1,
@@ -42,6 +45,7 @@ affected_lengths = pd.concat([aa_loss, aa_gain])
 
 binwidth = 50
 xmax = 600
+xtick = 200
 
 fig = plt.figure(figsize=(4.5, 2))
 data = affected_lengths[affected_lengths['pblock_category'] != 'SUBSTITUTION (alternative)']
@@ -81,6 +85,7 @@ facets.set_xlabels('Length of altered region (amino acids)')
 facets.set_ylabels('Number of\naltered regions')
 for category, ax in facets.axes_dict.items():
     ax.set_title(category.capitalize())
+    ax.set_xticks(range(0, xmax+1, xtick))
     ax.ticklabel_format(axis='y', style='sci', scilimits=(-1, 1))
     ax.vlines(affected_lengths[affected_lengths['pblock_category'] == category]['length'].median(), *ax.get_ylim(), color='#808080', linestyle='-', linewidth=1)
 
@@ -102,26 +107,29 @@ ax = sns.histplot(
     },
     alpha = 1,
 )
-# ax.spines.right.set_visible(False)
-# ax.spines.top.set_visible(False)
 ax.set_xlim(0, xmax)
 ax.set_ylim(0, xmax)
+ax.set_xticks(range(0, xmax+1, xtick))
+ax.set_yticks(range(0, xmax+1, xtick))
 ax.set_xlabel('Length of substitution region \nin alternative isoform (AA)')
 ax.set_ylabel('Length of substitution region \nin reference isoform (AA)')
 plt.savefig(output/'substitution-reference-alternative-lengths.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 # %% Pie chart
 category_counts = pblocks['pblock_category'].value_counts()
-fig = plt.figure()
-wedges, texts = plt.pie(
+total_pblocks = category_counts.sum()
+fig, ax = plt.subplots()
+wedges, texts, autotexts = plt.pie(
     category_counts,
     colors = category_counts.index.map(PBLOCK_COLORS),
     wedgeprops = {'width': 0.4},
-    startangle = 0,
+    startangle = 180,
+    counterclock = False,
+    autopct = lambda x: f'{np.round(total_pblocks*x/100):.0f}\n({x:.0f}%)',
+    pctdistance = 1.3,
 )
-for wedge in wedges:
+for i, wedge in enumerate(wedges):
     wedge.set_edgecolor('k')
-
 fig.savefig(output/'altered-region-category-donut.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 # %%

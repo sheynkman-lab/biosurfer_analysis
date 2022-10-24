@@ -29,9 +29,9 @@ def adjust_lightness(color, amount=0.5):
     return mc.to_hex(cnew)
 
 PBLOCK_COLORS = {
-    'DELETION': '#ff0082',
-    'INSERTION': '#05e0ff',
-    'SUBSTITUTION': '#ffd700',
+    'DELETION': '#f800c0',
+    'INSERTION': '#00c0f8',
+    'SUBSTITUTION': '#f8c000',
 }
 
 PBLOCK_COLORS['SUBSTITUTION (reference)'] = adjust_lightness(PBLOCK_COLORS['SUBSTITUTION'], 1)
