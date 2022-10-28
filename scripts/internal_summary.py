@@ -48,7 +48,7 @@ ax = sns.countplot(
 plt.legend(loc='upper right', labels=['Deletions', 'Insertions', 'Substitutions'])
 ax.set_xlabel('Number of altered internal regions')
 ax.set_ylabel(None)
-internal_pblocks_fig.savefig(output/'internal-pblock-events.png', dpi=200, facecolor=None, bbox_inches='tight')
+internal_pblocks_fig.savefig(output/'internal-events.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 # %%
 internal_pblocks_ragged_fig = plt.figure(figsize=(4.6, 3.8))
@@ -67,10 +67,32 @@ sns.countplot(
     edgecolor = 'k',
     hatch = '///',
 )
-plt.legend(loc='upper right', handles=[Patch(facecolor='w', edgecolor='k', hatch='///'), Patch(facecolor='w', edgecolor='k')], labels=['Ragged codons', 'No ragged codons'])
+plt.legend(loc='upper right', handles=[Patch(facecolor='w', edgecolor='k', hatch='///')], labels=['Contains \nragged codons'])
 ax.set_xlabel('Number of altered internal regions')
 ax.set_ylabel(None)
-internal_pblocks_ragged_fig.savefig(output/'internal-pblock-events-ragged.png', dpi=200, facecolor=None, bbox_inches='tight')
+internal_pblocks_ragged_fig.savefig(output/'internal-events-ragged.png', dpi=200, facecolor=None, bbox_inches='tight')
+
+# %%
+internal_rel_length_change = plt.figure(figsize=(4.6, 3.8))
+ax = sns.boxenplot(
+    data = internal_pblocks,
+    x = internal_pblocks['anchor_relative_length_change'].abs(),
+    y = 'splice event',
+    k_depth = 'trustworthy',
+    trust_alpha = 0.01,
+    palette = SPLICE_EVENT_COLORS,
+    saturation = 1,
+    linewidth = 1,
+    box_kws = {'edgecolor': 'k'},
+    line_kws = {'color': 'k', 'alpha': 1},
+)
+ax.set_xlim(0, 1)
+ax.set_xlabel('Change in protein length\n(fraction of reference isoform length)')
+ax.set_ylabel(None)
+internal_rel_length_change.savefig(output/'internal-rel-length-change.png', dpi=200, facecolor=None, bbox_inches='tight')
+
+# %%
+nagnag_pblocks = internal_pblocks[(internal_pblocks['splice event'] == 'Alt. acceptor') & (internal_pblocks['length_change'].abs() == 1)]
 
 # %%
 internal_compound_pblocks = internal_pblocks[internal_pblocks['splice event'] == 'Compound'].copy()
@@ -120,6 +142,6 @@ ax = sns.countplot(
 )
 ax.set_xlabel('Number of altered\ninternal regions'),
 ax.set_ylabel(None)
-internal_pblocks_compound_fig.savefig(output/'internal-pblock-compound-events.png', dpi=200, facecolor=None, bbox_inches='tight')
+internal_pblocks_compound_fig.savefig(output/'internal-compound-events.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 # %%

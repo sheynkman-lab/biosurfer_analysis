@@ -7,11 +7,31 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 
-from plot_config import PBLOCK_COLORS, pblocks
+from plot_config import PBLOCK_COLORS, SECTION_COLORS, pblocks
 
 # %% Output paths
 output = Path('../C_altered_region_summary_plots')
 output.mkdir(exist_ok=True)
+
+# %%
+fig = plt.figure(figsize=(4, 2.4))
+bins = list(range(1, 11)) + [100]
+ax = sns.histplot(
+    x = pd.cut(
+        pblocks.groupby('anchor')['other'].nunique(),
+        bins = bins,
+        right = False,
+        labels = [str(x) for x in bins[:-2]] + [f'{bins[-2]}+'],
+    ),
+    shrink = 0.75,
+    color = '#888888',
+    edgecolor = 'k',
+    alpha = 1,
+)
+ax.set_xlabel('Number of alternative isoforms\nper gene')
+ax.set_ylabel('Number of genes')
+ax.set_ylim(0, 5000)
+fig.savefig(output/'alternative-isoforms-per-gene.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 # %% Plot 3A: Number of observed pblocks per alternative protein isoforms
 fig = plt.figure(figsize=(4, 2.4))
@@ -29,7 +49,7 @@ ax = sns.histplot(
 )
 ax.set_xlabel('Number of altered regions\nper isoform')
 ax.set_ylabel('Number of alternative\nprotein isoforms')
-ax.set_ylim(0, 30000)
+# ax.set_ylim(0, 30000)
 ax.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
 
 fig.savefig(output/'altered-regions-per-isoform.png', dpi=200, facecolor=None, bbox_inches='tight')
@@ -47,7 +67,7 @@ binwidth = 50
 xmax = 600
 xtick = 200
 
-fig = plt.figure(figsize=(4.5, 2))
+fig = plt.figure(figsize=(5, 2))
 data = affected_lengths[affected_lengths['pblock_category'] != 'SUBSTITUTION (alternative)']
 ax = sns.histplot(
     data = data,
@@ -131,5 +151,45 @@ wedges, texts, autotexts = plt.pie(
 for i, wedge in enumerate(wedges):
     wedge.set_edgecolor('k')
 fig.savefig(output/'altered-region-category-donut.png', dpi=200, facecolor=None, bbox_inches='tight')
+
+# %%
+def get_section(nterm, cterm):
+    if nterm and cterm:
+        return 'Full-length'
+    elif nterm:
+        return 'N-terminal'
+    elif cterm:
+        return 'C-terminal'
+    else:
+        return 'Internal'
+
+pblocks['protein_section'] = list(map(get_section, ~pblocks['nterm'].isna(), ~pblocks['cterm'].isna()))
+pblock_sections = pblocks['protein_section'].value_counts()
+
+fig, ax = plt.subplots(figsize=(6, 1))
+left = 0
+for section, color in SECTION_COLORS.items():
+    val = pblock_sections[section]
+    label = f'{val:g}\n({100*val/pblock_sections.sum():0.1f}%)'
+    if section == 'Full-length':
+        left += 5000
+        label_type = 'edge'
+        padding = 5
+    else:
+        label_type = 'center'
+        padding = 0
+    bar = plt.barh(
+        [0],
+        val,
+        left = left,
+        color = color,
+        edgecolor = 'k',
+        label = section,
+    )
+    plt.bar_label(bar, labels=[label], label_type=label_type, padding=padding)
+    left = left + pblock_sections[section]
+ax.legend(loc='upper left', bbox_to_anchor=(0, 0, 1, -0.1), ncols=2, frameon=False)
+plt.axis('off')
+fig.savefig(output/'protein-section-counts.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 # %%

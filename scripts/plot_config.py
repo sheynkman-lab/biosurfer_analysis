@@ -37,11 +37,18 @@ PBLOCK_COLORS = {
 PBLOCK_COLORS['SUBSTITUTION (reference)'] = adjust_lightness(PBLOCK_COLORS['SUBSTITUTION'], 1)
 PBLOCK_COLORS['SUBSTITUTION (alternative)'] = adjust_lightness(PBLOCK_COLORS['SUBSTITUTION'], 1)
 
+SECTION_COLORS = {
+    'N-terminal': color_palette('pastel')[2],
+    'Internal': color_palette('pastel')[7],
+    'C-terminal': color_palette('pastel')[3],
+    'Full-length': 'none',
+}
+
 NTERM_CLASSES = {
-    'MUTUALLY_EXCLUSIVE': 'Alternative initiation exon',
-    'DOWNSTREAM_SHARED': 'Hybrid initiation exon',
-    'UPSTREAM_SHARED': 'Splicing-dependent initiation',
-    'MUTUALLY_SHARED': 'Alternative translation initiation'
+    'MUTUALLY_EXCLUSIVE': 'Mutually exclusive starts',
+    'DOWNSTREAM_SHARED': 'Shared downstream start',
+    'UPSTREAM_SHARED': 'Shared upstream start',
+    'MUTUALLY_SHARED': 'Mutually shared starts'
 }
 NTERM_COLORS = dict(zip(
     NTERM_CLASSES.values(),
@@ -58,14 +65,14 @@ SPLICE_EVENT_COLORS = {
 }
 
 CTERM_CLASSES = {
-    'SPLICING' :  'splicing',
-    'FRAMESHIFT' : 'frameshift',
+    'SPLICING' :  'Splice-driven',
+    'FRAMESHIFT' : 'Frameshift-driven',
 }
 cterm_splice_palette = color_palette('RdPu_r', n_colors=3)
-cterm_frameshift_palette = color_palette('YlOrRd_r', n_colors=4)
-CTERM_PALETTE = [cterm_splice_palette[0], color_palette('YlOrRd_r', n_colors=4)[0]]
+cterm_frameshift_palette = color_palette('YlOrRd_r', n_colors=5)
+CTERM_PALETTE = [cterm_splice_palette[0], cterm_frameshift_palette[0]]
 
 # # GENCODE v42
 pblocks = pd.read_csv('../B_hybrid_aln_gencode_v42/pblocks.tsv', sep='\t')
 # # WTC11
-# pblocks = pd.read_csv('../B_hybrid_aln_wtc11_v42/pblocks.tsv', sep='\t')
+# pblocks = pd.read_csv('../A_wtc11/pblocks.tsv', sep='\t')

@@ -14,9 +14,9 @@ output = Path('../D_nterm_summary_plots')
 output.mkdir(exist_ok=True)
 
 # %%
-nterm_pblocks = pblocks[~pblocks['nterm'].isna() & (pblocks['nterm'] != 'ALTERNATIVE_ORF') & (pblocks['cterm'] != 'ALTERNATIVE_ORF')].copy()
+nterm_pblocks = pblocks[~pblocks['nterm'].isna() & (pblocks['nterm'] != 'ALTERNATIVE_ORF') & (pblocks['cterm'].isna())].copy()
 nterm_pblocks['nterm'].replace(NTERM_CLASSES, inplace=True)
-nterm_pblocks['altTSS'] = nterm_pblocks['events'].apply(lambda x: set(x).intersection('BbPp')).astype(bool)
+nterm_pblocks['altTSS'] = nterm_pblocks['events'].apply(lambda x: eval(x).intersection('BbPp')).astype(bool)
 
 # %%
 fig = plt.figure(figsize=(5, 4))
@@ -38,7 +38,7 @@ tss_fig = plt.figure(figsize=(5, 2))
 ax = sns.countplot(
     data = nterm_pblocks,
     y = 'nterm',
-    order = ('Alternative initiation exon', 'Hybrid initiation exon'),
+    order = ('Mutually exclusive starts', 'Shared downstream start'),
     palette = NTERM_COLORS,
     edgecolor = 'k',
     saturation = 1,
@@ -47,7 +47,7 @@ sns.countplot(
     ax = ax,
     data = nterm_pblocks[nterm_pblocks['altTSS']],
     y = 'nterm',
-    order = ('Alternative initiation exon', 'Hybrid initiation exon'),
+    order = ('Mutually exclusive starts', 'Shared downstream start'),
     palette = NTERM_COLORS,
     edgecolor = 'k',
     fill = False,
@@ -65,28 +65,31 @@ plt.savefig(output/'nterm-altTSS-counts.png', dpi=200, facecolor=None, bbox_inch
 
 # %%
 nterm_length_fig = plt.figure(figsize=(5, 2))
-ax = sns.boxplot(
+ax = sns.boxenplot(
     data = nterm_pblocks,
-    x = 'anchor_relative_length_change',
+    x = nterm_pblocks['anchor_relative_length_change'].abs(),
     y = 'nterm',
-    order = ('Alternative initiation exon', 'Hybrid initiation exon'),
+    order = ('Mutually exclusive starts', 'Shared downstream start'),
+    k_depth = 'trustworthy',
+    trust_alpha = 0.01,
     palette = NTERM_COLORS,
     saturation = 1,
-    fliersize = 2,
-    flierprops = {'marker': 'x'}
+    linewidth = 1,
+    box_kws = {'edgecolor': 'k'},
+    line_kws = {'color': 'k', 'alpha': 1},
 )
 xmax = max(ax.get_xlim())
 ymin, ymax = ax.get_ylim()
 ax.vlines(x=0, ymin=ymin, ymax=ymax, color='#808080', linewidth=1, linestyle='--')
-ax.set_xlim(-1, 1)
+ax.set_xlim(0, 1)
 ax.set_xlabel('Change in N-terminal length\n(fraction of reference isoform length)')
 ax.set_ylabel(None)
 
 nterm_length_fig.savefig(output/'nterm-rel-length-change.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 # %%
-aie_rel_lengths = nterm_pblocks[nterm_pblocks['nterm'] == 'Alternative initiation exon']['anchor_relative_length_change']
-hie_rel_lengths = nterm_pblocks[nterm_pblocks['nterm'] == 'Hybrid initiation exon']['anchor_relative_length_change']
-mannwhitneyu(aie_rel_lengths, hie_rel_lengths)
+mxs_rel_lengths = nterm_pblocks[nterm_pblocks['nterm'] == 'Mutually exclusive starts']['anchor_relative_length_change'].abs()
+sds_rel_lengths = nterm_pblocks[nterm_pblocks['nterm'] == 'Shared downstream start']['anchor_relative_length_change'].abs()
+mannwhitneyu(mxs_rel_lengths, sds_rel_lengths)
 
 # %%
