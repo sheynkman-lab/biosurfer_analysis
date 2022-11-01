@@ -57,11 +57,11 @@ NTERM_COLORS = dict(zip(
 
 SPLICE_EVENT_COLORS = {
     'Intron': '#EBA85F',
+    'Single exon': '#649FD2',
     'Alt. donor': '#86BB6F',
     'Alt. acceptor': '#A26FBB',
-    'Single exon': '#649FD2',
-    'Mutually exclusive exons': '#3674AF',
-    'Compound': '#888888'
+    'Compound': '#888888',
+    'Frameshift': '#F7D76E',
 }
 
 CTERM_CLASSES = {
