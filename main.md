@@ -22,7 +22,7 @@ conda install --channel conda-forge graph-tool
 
 ### Clone the repository
 ```
-git clone -b dev --single-branch https://github.com/sheynkman-lab/biosurfer.git
+git clone https://github.com/sheynkman-lab/biosurfer.git
 ```    
 ### Run setup 
 ```
@@ -34,7 +34,7 @@ pip install --editable biosurfer
 
 ## Step 3 - download input data
 ```
-for source in gencode_toy gencode_v41 wtc11
+for source in gencode_toy gencode_v42 wtc11
 do
     bash "./scripts/download_$source.sh"
 done
@@ -64,7 +64,7 @@ biosurfer load_db \
     -d gencode_v42
 
 ```
-### wtc11
+### wtc11 with APPRIS from gencode_42
 ```
 biosurfer load_db \
     --source=GENCODE \
@@ -122,7 +122,9 @@ biosurfer hybrid_alignment \
 ```
 pip install ipykernel xlsxwriter openpyxl plotly
 ```
-
+```
+cd ./scripts/
+```
 ### Run Python script
 ```
 python3 ./scripts/genome_wide_summary.py

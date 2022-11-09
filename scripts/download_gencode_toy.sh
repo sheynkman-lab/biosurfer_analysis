@@ -2,7 +2,7 @@
 #Author: Mayank Murali
 #Project: Biosurfer
 
-#Script to download GENCODE toy files from Zenodo (https://zenodo.org/record/7182809)
+#Script to download GENCODE toy files from Zenodo (https://zenodo.org/record/7297008)
 
 echo "================================================================="
 echo "  Downloading GENCODE toy data ..."
@@ -12,6 +12,6 @@ cd data
 mkdir A_gencode_toy
 cd A_gencode_toy
 
-wget https://zenodo.org/record/7182809/files/biosurfer_gencode_toy_data.zip
+wget https://zenodo.org/record/7297008/files/biosurfer_gencode_toy_data.zip
 unzip biosurfer_gencode_toy_data.zip 
 rm -rf __MACOSX biosurfer_gencode_toy_data.zip
