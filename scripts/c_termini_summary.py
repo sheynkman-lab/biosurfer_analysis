@@ -39,6 +39,9 @@ ax.set_xlabel('Number of alternative isoforms')
 ax.set_ylabel('')
 plt.savefig(output/'cterm-class-counts.png', dpi=200, facecolor=None, bbox_inches='tight')
 
+#Output source data
+cterm_pblocks.query("cterm in ['Splice-driven', 'Frameshift-driven']")[['anchor','other','cterm']].to_csv(output/'cterm-class-counts-table.tsv', sep='\t')
+
 # %% Plot 2: 
 cterm_pblock_events = cterm_pblocks['up_stop_events'].combine(cterm_pblocks['down_stop_events'], lambda x, y: (x, y))
 single_ATE = (cterm_pblocks['cterm'] == 'Splice-driven') & cterm_pblocks['tblock_events'].isin({('B', 'b'), ('b', 'B')})
@@ -94,6 +97,9 @@ axs[1].set_ylim([ymin, ymax])
 axs[1].set_xlabel('Change in C-terminal length\n (fraction of anchor isoform length)')
 axs[1].set_ylabel('')
 plt.savefig(output/'cterm-splicing-subcats.png', dpi=200, facecolor=None, bbox_inches='tight')
+
+#Output source data
+cterm_pblocks.assign(anchor_relative_length_change = cterm_pblocks['anchor_relative_length_change'].abs())[['anchor','other', 'splice_subcat','anchor_relative_length_change']].to_csv(output/'cterm-splicing-subcats-table.tsv', sep='\t')
 
 #%% Plot 3: 
 cterm_frame_subcats = pd.DataFrame(
@@ -151,5 +157,8 @@ axs[1].set_ylim([ymin, ymax])
 axs[1].set_xlabel('Change in C-terminal length\n (fraction of reference isoform length)')
 axs[1].set_ylabel('')
 plt.savefig(output/'cterm-frameshift-subcats.png', dpi=200, facecolor=None, bbox_inches='tight')
+
+#Output source data
+cterm_pblocks.assign(anchor_relative_length_change = cterm_pblocks['anchor_relative_length_change'].abs()).query("cterm in 'Frameshift-driven'")[['anchor','other', 'frame_subcat','anchor_relative_length_change']].to_csv(output/'cterm-frameshift-subcats-table.tsv', sep='\t')
 
 # %%

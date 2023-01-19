@@ -33,6 +33,9 @@ ax.set_ylabel(None)
 
 fig.savefig(output/'nterm-mechanism-counts.png', dpi=200, facecolor=None, bbox_inches='tight')
 
+#Output source data
+nterm_pblocks[['anchor','other','nterm']].to_csv(output/'nterm-mechanism-counts-table.tsv', sep='\t')
+
 # %%
 tss_fig = plt.figure(figsize=(5, 2))
 ax = sns.countplot(
@@ -63,6 +66,9 @@ ax.set_xlabel('Number of alternative isoforms')
 ax.set_ylabel(None)
 plt.savefig(output/'nterm-altTSS-counts.png', dpi=200, facecolor=None, bbox_inches='tight')
 
+#Output source data
+nterm_pblocks.query("nterm in ['Mutually exclusive starts', 'Shared downstream start']")[['anchor','other','nterm','altTSS']].to_csv(output/'nterm-altTSS-counts-table.tsv', sep='\t')
+
 # %%
 nterm_length_fig = plt.figure(figsize=(5, 2))
 ax = sns.boxenplot(
@@ -86,6 +92,9 @@ ax.set_xlabel('Change in N-terminal length\n(fraction of reference isoform lengt
 ax.set_ylabel(None)
 
 nterm_length_fig.savefig(output/'nterm-rel-length-change.png', dpi=200, facecolor=None, bbox_inches='tight')
+
+#Output source data
+nterm_pblocks.query("nterm in ['Mutually exclusive starts', 'Shared downstream start']")[['anchor','other','nterm','altTSS']].to_csv(output/'nterm-rel-length-change-table.tsv', sep='\t')
 
 # %%
 mxs_rel_lengths = nterm_pblocks[nterm_pblocks['nterm'] == 'Mutually exclusive starts']['anchor_relative_length_change'].abs()

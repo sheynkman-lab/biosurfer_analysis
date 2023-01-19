@@ -53,6 +53,9 @@ ax.set_xlabel('Number of altered internal regions')
 ax.set_ylabel(None)
 internal_pblocks_fig.savefig(output/'internal-events.png', dpi=200, facecolor=None, bbox_inches='tight')
 
+#Output source data
+internal_pblocks[['splice_event','pblock_category']].to_csv(output/'internal-events-table.tsv', sep='\t')
+
 # %%
 internal_pblocks_ragged_fig = plt.figure(figsize=(4.6, 3.8))
 ax = sns.countplot(
@@ -75,6 +78,8 @@ ax.set_xlabel('Number of altered internal regions')
 ax.set_ylabel(None)
 internal_pblocks_ragged_fig.savefig(output/'internal-events-ragged.png', dpi=200, facecolor=None, bbox_inches='tight')
 
+#Output source data
+internal_pblocks[['splice_event','split_codons']].to_csv(output/'internal-events-ragged-table.tsv', sep='\t')
 # %%
 alpha = 0.01
 ragged_contingency = pd.crosstab(internal_pblocks['split_codons'], internal_pblocks['splice_event'])
@@ -106,6 +111,11 @@ ax.set_xlim(0, 1)
 ax.set_xlabel('Change in protein length\n(fraction of reference isoform length)')
 ax.set_ylabel(None)
 internal_rel_length_change.savefig(output/'internal-rel-length-change.png', dpi=200, facecolor=None, bbox_inches='tight')
+
+#Output source data
+df = internal_pblocks[['splice_event','anchor_relative_length_change']]
+df['anchor_relative_length_change'] = df['anchor_relative_length_change'].abs()
+df.to_csv(output/'internal-rel-length-change-table.tsv', sep='\t')
 
 # %%
 nagnag_pblocks = internal_pblocks[(internal_pblocks['splice_event'] == 'Alt. acceptor') & (internal_pblocks['length_change'].abs() == 1)]
@@ -161,4 +171,6 @@ ax.set_xlabel('Number of altered\ninternal regions'),
 ax.set_ylabel(None)
 internal_pblocks_compound_fig.savefig(output/'internal-compound-events.png', dpi=200, facecolor=None, bbox_inches='tight')
 
+#Output source data
+internal_compound_pblocks[['anchor','other','compound_subcat']].to_csv(output/'internal-compound-events-table.tsv', sep='\t')
 # %%
