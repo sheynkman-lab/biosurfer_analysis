@@ -1,51 +1,68 @@
 # Biosurfer Analysis
 
-#### Steps to run the biosurfer analysis that reproduces results, summary plots and figures for Biosurfer manuscript.
+## Analysis accompanying the manuscript *"Biosurfer: Connecting genomic, transcriptomic, and proteomic information layers to track mechanisms of protein isoform variation"*
 
-## Step 1 - Create the conda environment for biosurfer
+This repository contains steps to run the biosurfer analysis, which reproduces the results, summary plots, and figures for the Biosurfer manuscript ([bioRxiv]()).
 
+
+**Contents**
+1. [Download and install Biosurfer](#download-and-install-biosurfer)
+2. [Download input data](#download-input-data)
+3. [Run Biosurfer modules](#run-biosurfer-modules)
+    i.  [Load database](#load-database)
+    ii.  [Run hybrid alignment](#run-hybrid-alignment)
+    iii.  [Visualize protein isoforms](#visualize-protein-isoforms)
+4. [Global characterization of altered protein regions in the human annotation (GENCODE)](#post-processing)
+    i. [Altered protein regions across the human proteome](#genome-wide-summary)
+    ii. [Analysis of alternative splicing events that alter the N-terminus of proteins](#n-term)
+    iii. [Characterization of splicing patterns underlying internal protein region differences](#internal-region)
+    iv. [Analyzing splicing patterns for C-terminal alterations](#c-term)
+    
+
+
+<a id="download-and-install-biosurfer"></a>
+## 1. Download and install Biosurfer
+
+
+#### Create the conda environment for Biosurfer
 ```
 conda create --name biosurfer-install --channel conda-forge python=3 pip 
 ```
-
-### Then activate the environment:
+#### Activate the conda environment:
 ```
 conda activate biosurfer-install
 
 conda install --channel conda-forge graph-tool
 ```
 
-
----
-
-## Step 2 - install biosurfer (the stable dev-version)
-
-### Clone the repository
+#### Install Biosurfer (stable version): Clone the repository
 ```
-git clone https://github.com/sheynkman-lab/biosurfer.git
+git clone -b dev --single-branch https://github.com/sheynkman-lab/biosurfer.git
 ```    
-### Run setup 
+#### Run setup 
 ```
 pip install --editable biosurfer
 ```
-
-
 ---
 
-## Step 3 - download input data
+<a id="download-input-data"></a>
+## 2. Download input data
+
 ```
-for source in gencode_toy gencode_v42 wtc11
+for source in gencode_toy gencode_v41 wtc11
 do
     bash "./scripts/download_$source.sh"
 done
 ```
-
-
 ---
 
-## Step 4 - Create toy dataset on biosurfer
+<a id="run-biosurfer-modules"></a>
+## 3. Run Biosurfer modules
+
+<a id="load-database"></a>
+### i. Load database
     
-### gencode_toy
+#### gencode_toy
 ```
 biosurfer load_db \
     --source=GENCODE \
@@ -54,7 +71,7 @@ biosurfer load_db \
     --tl_fasta A_gencode_toy/biosurfer_gencode_toy_data/gencode.v38.toy.translations.fa \
     -d gencode_toy
 ```
-### gencode_v42
+#### gencode_v42
 ```
 biosurfer load_db \
     --source=GENCODE \
@@ -62,9 +79,8 @@ biosurfer load_db \
     --tx_fasta A_gencode_v42/biosurfer_gencode_v42_data/gencode.v42.pc_transcripts.fa \
     --tl_fasta A_gencode_v42/biosurfer_gencode_v42_data/gencode.v42.pc_translations.fa \
     -d gencode_v42
-
 ```
-### wtc11 with APPRIS from gencode_42
+#### wtc11
 ```
 biosurfer load_db \
     --source=GENCODE \
@@ -72,7 +88,6 @@ biosurfer load_db \
     --tx_fasta A_gencode_v42/biosurfer_gencode_v42_data/gencode.v42.pc_transcripts.fa \
     --tl_fasta A_gencode_v42/biosurfer_gencode_v42_data/gencode.v42.pc_translations.fa \
     -d wtc11
-
 ```
 ```    
     biosurfer load_db \
@@ -83,12 +98,12 @@ biosurfer load_db \
     --sqanti A_wtc11/biosurfer_wtc11_data/wtc11_classification.txt \
     -d wtc11
 ```
-
-
 ---
 
-## Step 5 - Run biosurfer hybrid alignment on the toy dataset
-### gencode_toy
+<a id="run-hybrid-alignment"></a>
+### ii. Run hybdrid alignment
+
+#### gencode_toy
 ```
 mkdir B_hybrid_aln_results_toy
 biosurfer hybrid_alignment \
@@ -96,7 +111,7 @@ biosurfer hybrid_alignment \
     -o B_hybrid_aln_results_toy \
     --gencode
 ```
-### gencode_v42
+#### gencode_v42
 ```    
 mkdir B_hybrid_aln_gencode_v42
 biosurfer hybrid_alignment \
@@ -104,53 +119,54 @@ biosurfer hybrid_alignment \
     -o B_hybrid_aln_gencode_v42 \
     --gencode
 ```
-### wtc11
+#### wtc11
 ```
 mkdir B_hybrid_aln_wtc11
 biosurfer hybrid_alignment \
     -d wtc11 \
     -o B_hybrid_aln_wtc11
 ```
-
 ---
 
+<a id="visualize-protein-isoforms"></a>
+### iii. Visualize protein isoforms
 
-## Step 6 - Post-process hybrid alignment output table / genome wide analysis
+```
+bash ./scripts/isoform_plotting.sh
+```
+---
+
+<a id="post-processing"></a>
+## 4. Global characterization of altered protein regions in the human annotation (GENCODE)
 
 
-### Install required libraries 
+#### Install required libraries 
 ```
 pip install ipykernel xlsxwriter openpyxl plotly
 ```
-```
-cd ./scripts/
-```
-### Run Python script
+
+<a id="genome-wide-summary"></a>
+### i. Altered protein regions across the human proteome
 ```
 python3 ./scripts/genome_wide_summary.py
 ```
 
-## Step 7 - N-termini summary 
-
-### Run Python script
+<a id="n-term"></a>
+### ii. Analysis of alternative splicing events that alter the N-terminus of proteins
 ```
 python3 ./scripts/n_termini_summary.py
 ```
 
-## Step 8 - C-termini summary
+<a id="internal-region"></a>
+### iii. Characterization of splicing patterns underlying internal protein region differences
+```
+python3 ./scripts/internal_summary.py
+```
 
-### Run Python script
+<a id="c-term"></a>
+### iv. Analyzing splicing patterns for C-terminal alterations
 ```
 python3 ./scripts/c_termini_summary.py
 ```
 
-## Step 9 - Internal region summary
 
-### Run Python script
-```
-python3 ./scripts/internal_summary.py
-```
-## Step 10 - Isoform plot visualization using Biosurfer
-```
-bash ./scripts/isoform_plotting.sh
-```
