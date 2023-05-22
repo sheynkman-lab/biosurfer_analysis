@@ -73,6 +73,6 @@ cterm_frameshift_palette = color_palette('YlOrRd_r', n_colors=5)
 CTERM_PALETTE = [cterm_splice_palette[0], cterm_frameshift_palette[0]]
 
 # # GENCODE v42
-#pblocks = pd.read_csv('../B_hybrid_aln_gencode_v42/pblocks.tsv', sep='\t')
+pblocks = pd.read_csv('../B_hybrid_aln_gencode_v42/pblocks.tsv', sep='\t')
 # # WTC11
-pblocks = pd.read_csv('../B_hybrid_aln_wtc11_v42/pblocks.tsv', sep='\t')
+#pblocks = pd.read_csv('../B_hybrid_aln_wtc11_v42/pblocks.tsv', sep='\t')
