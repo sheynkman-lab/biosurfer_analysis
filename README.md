@@ -9,22 +9,20 @@ This repository contains steps to run the biosurfer analysis, which reproduces t
 1. [Download and install Biosurfer](#download-and-install-biosurfer)
 2. [Download input data](#download-input-data)
 3. [Run Biosurfer modules](#run-biosurfer-modules)
-    i.  [Load database](#load-database)
-    ii.  [Run hybrid alignment](#run-hybrid-alignment)
-    iii.  [Visualize protein isoforms](#visualize-protein-isoforms)
+    1. [Load database](#load-database)
+    2. [Run hybrid alignment](#run-hybrid-alignment)
+    3. [Visualize protein isoforms](#visualize-protein-isoforms)
 4. [Global characterization of altered protein regions in the human annotation (GENCODE)](#post-processing)
-    i. [Altered protein regions across the human proteome](#genome-wide-summary)
-    ii. [Analysis of alternative splicing events that alter the N-terminus of proteins](#n-term)
-    iii. [Characterization of splicing patterns underlying internal protein region differences](#internal-region)
-    iv. [Analyzing splicing patterns for C-terminal alterations](#c-term)
-    
-
+    1. [Altered protein regions across the human proteome](#genome-wide-summary)
+    2. [Analysis of alternative splicing events that alter the N-terminus of proteins](#n-term)
+    3. [Characterization of splicing patterns underlying internal protein region differences](#internal-region)
+    4. [Analyzing splicing patterns for C-terminal alterations](#c-term)
 
 <a id="download-and-install-biosurfer"></a>
 ## 1. Download and install Biosurfer
 
 
-#### Create the conda environment for Biosurfer
+#### Create the conda environment for Biosurfer via terminal
 ```
 conda create --name biosurfer-install --channel conda-forge python=3 pip 
 ```
@@ -35,11 +33,12 @@ conda activate biosurfer-install
 conda install --channel conda-forge graph-tool
 ```
 
-#### Install Biosurfer (stable version): Clone the repository
+#### Clone Biosurfer repository
 ```
-git clone -b dev --single-branch https://github.com/sheynkman-lab/biosurfer.git
+git clone https://github.com/sheynkman-lab/biosurfer.git
 ```    
 #### Run setup 
+Note: if you get a `importlib.metadata.PackageNotFoundError` error, please deactivate and then activate the conda env again
 ```
 pip install --editable biosurfer
 ```
@@ -49,7 +48,7 @@ pip install --editable biosurfer
 ## 2. Download input data
 
 ```
-for source in gencode_toy gencode_v41 wtc11
+for source in gencode_toy gencode_v42 wtc11
 do
     bash "./scripts/download_$source.sh"
 done
@@ -58,7 +57,7 @@ done
 
 <a id="run-biosurfer-modules"></a>
 ## 3. Run Biosurfer modules
-
+For more information on the modules, refer to Biosurfer main repo ([here](https://github.com/sheynkman-lab/biosurfer#usage))
 <a id="load-database"></a>
 ### i. Load database
     
@@ -101,7 +100,7 @@ biosurfer load_db \
 ---
 
 <a id="run-hybrid-alignment"></a>
-### ii. Run hybdrid alignment
+### ii. Run hybrid alignment
 
 #### gencode_toy
 ```
@@ -139,7 +138,7 @@ bash ./scripts/isoform_plotting.sh
 <a id="post-processing"></a>
 ## 4. Global characterization of altered protein regions in the human annotation (GENCODE)
 
-
+The following steps reproduces the results for GENCODE v42. 
 #### Install required libraries 
 ```
 pip install ipykernel xlsxwriter openpyxl plotly
@@ -168,5 +167,7 @@ python3 ./scripts/internal_summary.py
 ```
 python3 ./scripts/c_termini_summary.py
 ```
+To reproduce the results for for WTC11: in [`plot_config.py`](https://github.com/sheynkman-lab/biosurfer_analysis/blob/main/scripts/plot_config.py) comment [`line 76`](https://github.com/sheynkman-lab/biosurfer_analysis/blob/84a32406ee70e0fea686a19be5b54599c21e5189/scripts/plot_config.py#L76) and uncomment [`line 78`](https://github.com/sheynkman-lab/biosurfer_analysis/blob/84a32406ee70e0fea686a19be5b54599c21e5189/scripts/plot_config.py#L78)
+
 
 
