@@ -36,6 +36,7 @@ conda install --channel conda-forge graph-tool
 #### Clone Biosurfer repository
 ```
 git clone https://github.com/sheynkman-lab/biosurfer.git
+cd biosurfer
 ```    
 #### Run setup 
 Note: if you get a `importlib.metadata.PackageNotFoundError` error, please deactivate and then activate the conda env again
