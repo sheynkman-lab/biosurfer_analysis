@@ -26,7 +26,7 @@ internal_pblocks['events'] = internal_pblocks['events'].map(eval)
 
 internal_subcats = pd.DataFrame(
     {
-        'Frameshift': internal_pblocks['frameshift'],
+        'Snapback': internal_pblocks['frameshift'],
         'Intron': internal_pblocks['tblock_events'].isin({('I',), ('i',)}),
         'Alt. donor': internal_pblocks['tblock_events'].isin({('D',), ('d',)}),
         'Alt. acceptor': internal_pblocks['tblock_events'].isin({('A',), ('a',)}),
@@ -34,7 +34,7 @@ internal_subcats = pd.DataFrame(
         'Compound': [True for _ in internal_pblocks.index]
     }
 )
-subcat_order = ('Intron', 'Alt. donor', 'Alt. acceptor', 'Single exon', 'Compound', 'Frameshift')
+subcat_order = ('Intron', 'Alt. donor', 'Alt. acceptor', 'Single exon', 'Compound', 'Snapback')
 internal_pblocks['splice_event'] = internal_subcats.idxmax(axis=1).astype(pd.CategoricalDtype(subcat_order, ordered=True))
 
 # %%
@@ -51,10 +51,12 @@ ax = sns.countplot(
 plt.legend(loc='upper right', labels=['Deletions', 'Insertions', 'Substitutions'])
 ax.set_xlabel('Number of altered internal regions')
 ax.set_ylabel(None)
+### output
 internal_pblocks_fig.savefig(output/'internal-events.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 #Output source data
-internal_pblocks[['splice_event','pblock_category']].to_csv(output/'internal-events-table.tsv', sep='\t')
+### output
+internal_pblocks[['anchor','other','splice_event','pblock_category']].to_csv(output/'internal-events-table.tsv', sep='\t')
 
 # %%
 internal_pblocks_ragged_fig = plt.figure(figsize=(4.6, 3.8))

@@ -13,7 +13,7 @@ from plot_config import PBLOCK_COLORS, SECTION_COLORS, pblocks
 output = Path('../C_altered_region_summary_plots')
 output.mkdir(exist_ok=True)
 
-# %%
+# %% Number of altered isoforms per gene vs number of genes
 fig = plt.figure(figsize=(4, 2.4))
 bins = list(range(1, 11)) + [100]
 ax = sns.histplot(
@@ -31,12 +31,14 @@ ax = sns.histplot(
 ax.set_xlabel('Number of alternative isoforms\nper gene')
 ax.set_ylabel('Number of genes')
 ax.set_ylim(0, 5000)
+### output
 fig.savefig(output/'alternative-isoforms-per-gene.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 #Output source data
-pblocks.groupby('anchor')['other'].nunique().to_frame().to_csv(output/'alternative-isoforms-per-gene-table.tsv', sep='\t')
+###
+pblocks.groupby('anchor')['other'].nunique().to_frame(name='count').to_csv(output/'alternative-isoforms-per-gene-table.tsv', sep='\t')
 
-# %% Plot 3A: Number of observed pblocks per alternative protein isoforms
+# %% Plot: Number of observed pblocks per alternative protein isoforms
 fig = plt.figure(figsize=(4, 2.4))
 ax = sns.histplot(
     x = pd.cut(
@@ -53,18 +55,20 @@ ax = sns.histplot(
 ax.set_xlabel('Number of altered regions\nper isoform')
 ax.set_ylabel('Number of alternative\nprotein isoforms')
 # ax.set_ylim(0, 30000)
-ax.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
+#ax.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
 
+### output
 fig.savefig(output/'altered-regions-per-isoform.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 #Output source data
-pblocks.groupby(['anchor', 'other']).size().to_frame().to_csv(output/'altered-regions-per-isoform-table.tsv', sep='\t')
+### output
+pblocks.groupby(['anchor', 'other']).size().to_frame(name='num_alt_regions').to_csv(output/'altered-regions-per-isoform-table.tsv', sep='\t')
 
-# %% Plot 3B: Distribution of lengths of the insertion, deletion and substituion affected regions for proteins 
-aa_loss = pblocks[pblocks['pblock_category'].isin({'DELETION', 'SUBSTITUTION'})].reset_index()[['pblock_category', 'aa_loss']]
+# %% Plot : Distribution of lengths of the insertion, deletion and substituion affected regions for proteins 
+aa_loss = pblocks[pblocks['pblock_category'].isin({'DELETION', 'SUBSTITUTION'})].reset_index()[['anchor','other','pblock_category', 'aa_loss']]
 aa_loss['pblock_category'].replace('SUBSTITUTION', 'SUBSTITUTION (reference)', inplace=True)
 aa_loss.rename(columns={'aa_loss': 'length'}, inplace=True)
-aa_gain = pblocks[pblocks['pblock_category'].isin({'INSERTION', 'SUBSTITUTION'})].reset_index()[['pblock_category', 'aa_gain']]
+aa_gain = pblocks[pblocks['pblock_category'].isin({'INSERTION', 'SUBSTITUTION'})].reset_index()[['anchor','other','pblock_category', 'aa_gain']]
 aa_gain['pblock_category'].replace('SUBSTITUTION', 'SUBSTITUTION (alternative)', inplace=True)
 aa_gain.rename(columns={'aa_gain': 'length'}, inplace=True)
 affected_lengths = pd.concat([aa_loss, aa_gain])
@@ -89,12 +93,14 @@ ax.set_ylabel('Number of\naltered regions')
 ax.ticklabel_format(axis='y', style='sci', scilimits=(-1, 1))
 ax.vlines(data['length'].median(), *ax.get_ylim(), color='#b0b0b0', linestyle='-', linewidth=1)
 
+### output
 fig.savefig(output/'altered-region-affected-lengths.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 #Output source data
+### output
 affected_lengths[affected_lengths['pblock_category'] != 'SUBSTITUTION (alternative)'].to_csv(output/'altered-region-affected-lengths-table.tsv', sep='\t')
 
-# %%
+# %% Figure 4C
 facets = sns.displot(
     data = affected_lengths,
     x = 'length',
@@ -118,9 +124,11 @@ for category, ax in facets.axes_dict.items():
     ax.ticklabel_format(axis='y', style='sci', scilimits=(-1, 1))
     ax.vlines(affected_lengths[affected_lengths['pblock_category'] == category]['length'].median(), *ax.get_ylim(), color='#808080', linestyle='-', linewidth=1)
 
+### output
 facets.fig.savefig(output/'altered-region-affected-lengths-categories.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 #Output source data
+### output
 affected_lengths.to_csv(output/'altered-region-affected-lengths-categories-table.tsv', sep='\t')
 
 # %% Plot 3C: Substitution scatter plot 
@@ -145,9 +153,11 @@ ax.set_xticks(range(0, xmax+1, xtick))
 ax.set_yticks(range(0, xmax+1, xtick))
 ax.set_xlabel('Length of substitution region \nin alternative isoform (AA)')
 ax.set_ylabel('Length of substitution region \nin reference isoform (AA)')
+### output
 plt.savefig(output/'substitution-reference-alternative-lengths.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 #Output source data
+### output
 pblocks.query("pblock_category == 'SUBSTITUTION'")[['anchor', 'other','pblock_category','aa_gain','aa_loss']].to_csv(output/'substitution-reference-alternative-lengths-table.tsv', sep='\t')
 
 # %% Pie chart
@@ -165,9 +175,11 @@ wedges, texts, autotexts = plt.pie(
 )
 for i, wedge in enumerate(wedges):
     wedge.set_edgecolor('k')
+### output
 fig.savefig(output/'altered-region-category-donut.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 #Output source data
+### output
 pblocks['pblock_category'].value_counts().to_csv(output/'altered-region-category-donut-table.tsv', sep='\t')
 
 # %%
@@ -208,9 +220,11 @@ for section, color in SECTION_COLORS.items():
     left = left + pblock_sections[section]
 ax.legend(loc='upper left', bbox_to_anchor=(0, 0, 1, -0.1), ncols=2, frameon=False)
 plt.axis('off')
+### output
 fig.savefig(output/'protein-section-counts.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 #Output source data
+### output
 with open(output/'protein-section-counts-table.tsv', 'w', newline='') as file:
     writer = csv.DictWriter(file, fieldnames=SECTION_COLORS.keys(), delimiter='\t')
     writer.writeheader()

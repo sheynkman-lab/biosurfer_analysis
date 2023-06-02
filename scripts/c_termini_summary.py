@@ -17,6 +17,7 @@ output = Path('../E_cterm_summary_plots')
 output.mkdir(exist_ok=True)
 
 #%%
+from plot_config import CTERM_CLASSES, CTERM_PALETTE, cterm_splice_palette, cterm_frameshift_palette, pblocks
 
 cterm_pblocks = pblocks[~pblocks['cterm'].isna() & (pblocks['nterm'].isna()) & (pblocks['cterm'] != "ALTERNATIVE_ORF") & (pblocks['cterm'] != "UNKNOWN")].copy()
 cterm_pblocks['cterm'] = cterm_pblocks['cterm'].map(CTERM_CLASSES).astype('category')
@@ -37,9 +38,11 @@ ax = sns.countplot(
 )
 ax.set_xlabel('Number of alternative isoforms')
 ax.set_ylabel('')
+### output
 plt.savefig(output/'cterm-class-counts.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 #Output source data
+### output
 cterm_pblocks.query("cterm in ['Splice-driven', 'Frameshift-driven']")[['anchor','other','cterm']].to_csv(output/'cterm-class-counts-table.tsv', sep='\t')
 
 # %% Plot 2: 
@@ -96,9 +99,11 @@ axs[1].set_xlim([0, 1])
 axs[1].set_ylim([ymin, ymax])
 axs[1].set_xlabel('Change in C-terminal length\n (fraction of anchor isoform length)')
 axs[1].set_ylabel('')
+### output
 plt.savefig(output/'cterm-splicing-subcats.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 #Output source data
+### output
 cterm_pblocks.assign(anchor_relative_length_change = cterm_pblocks['anchor_relative_length_change'].abs())[['anchor','other', 'splice_subcat','anchor_relative_length_change']].to_csv(output/'cterm-splicing-subcats-table.tsv', sep='\t')
 
 #%% Plot 3: 
@@ -156,9 +161,11 @@ axs[1].set_xlim([0, 1])
 axs[1].set_ylim([ymin, ymax])
 axs[1].set_xlabel('Change in C-terminal length\n (fraction of reference isoform length)')
 axs[1].set_ylabel('')
+### output
 plt.savefig(output/'cterm-frameshift-subcats.png', dpi=200, facecolor=None, bbox_inches='tight')
 
 #Output source data
+### output
 cterm_pblocks.assign(anchor_relative_length_change = cterm_pblocks['anchor_relative_length_change'].abs()).query("cterm in 'Frameshift-driven'")[['anchor','other', 'frame_subcat','anchor_relative_length_change']].to_csv(output/'cterm-frameshift-subcats-table.tsv', sep='\t')
 
 # %%
