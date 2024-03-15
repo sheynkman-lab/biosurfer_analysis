@@ -83,7 +83,9 @@ do
     bash "./scripts/download_$source.sh"
 done
 ```
-> Note: Any GENCODE version can be used with the appropriate GTF, transcript FASTA, and translation FASTA files. 
+> Note: Any GENCODE version can be used with the appropriate GTF, transcript FASTA, and translation FASTA files.
+
+> Please note that in the code, the terms *`anchor`* and *`other`* correspond to the *`reference`* and *`alternative`* isoforms mentioned in the manuscript.
 ---
 
 <a id="run-biosurfer-modules"></a>
