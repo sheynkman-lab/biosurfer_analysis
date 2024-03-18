@@ -2,10 +2,10 @@
 from pathlib import Path
 from matplotlib.patches import Patch
 from scipy.stats import mannwhitneyu
-
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import matplotlib as mpl
 
 from plot_config import NTERM_CLASSES, NTERM_COLORS, pblocks
 
@@ -18,8 +18,8 @@ nterm_pblocks = pblocks[~pblocks['nterm'].isna() & (pblocks['nterm'] != 'ALTERNA
 nterm_pblocks['nterm'].replace(NTERM_CLASSES, inplace=True)
 nterm_pblocks['altTSS'] = nterm_pblocks['events'].apply(lambda x: eval(x).intersection('BbPp')).astype(bool)
 
-# %%
-fig = plt.figure(figsize=(5, 4))
+# %% Fig3 panel A (both Alt TSS and 5' UTR AS)
+tss_fig = plt.figure(figsize=(5, 4))
 ax = sns.countplot(
     data = nterm_pblocks,
     y = 'nterm',
@@ -28,31 +28,11 @@ ax = sns.countplot(
     edgecolor = 'k',
     saturation = 1,
 )
-ax.set_xlabel('Number of altered N-terminal regions')
-ax.set_ylabel(None)
-
-### output
-fig.savefig(output/'nterm-mechanism-counts.png', dpi=200, facecolor=None, bbox_inches='tight')
-
-#Output source data
-### output
-nterm_pblocks[['anchor','other','nterm']].to_csv(output/'nterm-mechanism-counts-table.tsv', sep='\t')
-
-# %%
-tss_fig = plt.figure(figsize=(5, 2))
-ax = sns.countplot(
-    data = nterm_pblocks,
-    y = 'nterm',
-    order = ('Mutually exclusive starts', 'Shared downstream start'),
-    palette = NTERM_COLORS,
-    edgecolor = 'k',
-    saturation = 1,
-)
 sns.countplot(
     ax = ax,
     data = nterm_pblocks[nterm_pblocks['altTSS']],
     y = 'nterm',
-    order = ('Mutually exclusive starts', 'Shared downstream start'),
+    order = NTERM_COLORS.keys(),
     palette = NTERM_COLORS,
     edgecolor = 'k',
     fill = False,
@@ -66,45 +46,54 @@ ax.legend(
 )
 ax.set_xlabel('Number of alternative isoforms')
 ax.set_ylabel(None)
-### output
-plt.savefig(output/'nterm-altTSS-counts.png', dpi=200, facecolor=None, bbox_inches='tight')
+plt.savefig(output/'nterm-counts-all_mechanism.png', dpi=500, facecolor=None, bbox_inches='tight')
 
 #Output source data
-### output
-nterm_pblocks.query("nterm in ['Mutually exclusive starts', 'Shared downstream start']")[['anchor','other','nterm','altTSS']].to_csv(output/'nterm-altTSS-counts-table.tsv', sep='\t')
+nterm_pblocks.query("nterm in ['Mutually exclusive starts (MSX)', 'Shared downstream start (SDS)']")[['anchor','other','nterm','altTSS']].to_csv(output/'nterm-counts-all_mechanism.tsv', sep='\t')
 
-# %%
-nterm_length_fig = plt.figure(figsize=(5, 2))
-ax = sns.boxenplot(
-    data = nterm_pblocks,
-    x = nterm_pblocks['anchor_relative_length_change'].abs(),
-    y = 'nterm',
-    order = ('Mutually exclusive starts', 'Shared downstream start'),
-    k_depth = 'trustworthy',
-    trust_alpha = 0.01,
-    palette = NTERM_COLORS,
-    saturation = 1,
-    linewidth = 1,
-    box_kws = {'edgecolor': 'k'},
-    line_kws = {'color': 'k', 'alpha': 1},
-)
-xmax = max(ax.get_xlim())
-ymin, ymax = ax.get_ylim()
-ax.vlines(x=0, ymin=ymin, ymax=ymax, color='#808080', linewidth=1, linestyle='--')
-ax.set_xlim(0, 1)
-ax.set_xlabel('Change in N-terminal length\n(fraction of reference isoform length)')
-ax.set_ylabel(None)
+# %% Fig3 panel C: MXS vs SDS scatterplot 
+font = {
+    'family': 'sans-serif',
+    'sans-serif': ['Arial'],
+    'weight': 'normal',
+    'size': 10
+}
+mpl.rc('font', **font)
 
-### output
-nterm_length_fig.savefig(output/'nterm-rel-length-change.png', dpi=200, facecolor=None, bbox_inches='tight')
+# Filter the dataframe for 'Mutually exclusive starts (MXS)' and 'Shared downstream start (SDS)'
+msx_data = nterm_pblocks[nterm_pblocks['nterm'] == 'Mutually exclusive starts (MSX)']
+sds_data = nterm_pblocks[nterm_pblocks['nterm'] == 'Shared downstream start (SDS)']
+fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(5.5, 5.5))
+msx_color = (0.565498, 0.84243, 0.262877)
+sds_color = (0.20803, 0.718701, 0.472873)
+
+sns.scatterplot(data=msx_data, x='aa_loss', y='aa_gain', marker='.', ax=axes[0], alpha=0.2,
+                color=msx_color)
+axes[0].set_title('Mutually exclusive starts (MXS)', fontsize=11)  
+axes[0].set_xlabel('Reference \n(amino acids)', fontsize=10) 
+axes[0].set_ylabel('Alternative \n(amino acids)', fontsize=10) 
+axes[0].set_xlim(0, 2000)
+axes[0].set_ylim(0, 2000)
+axes[0].set_aspect('equal') 
+axes[0].grid(True, linestyle='--', linewidth=0.5)
+
+sns.scatterplot(data=sds_data, x='aa_loss', y='aa_gain', marker='.', ax=axes[1], alpha=0.2, color=sds_color)
+axes[1].set_title('Shared downstream start (SDS)', fontsize=11)  
+axes[1].set_xlabel('Reference \n(amino acids)', fontsize=10) 
+axes[1].set_ylabel('Alternative \n(amino acids)', fontsize=10) 
+axes[1].set_xlim(0, 2000)
+axes[1].set_ylim(0, 2000)
+axes[1].set_aspect('equal')  
+axes[1].grid(True, linestyle='--', linewidth=0.5)
+
+plt.tight_layout()
+
+# Save plot
+plt.savefig(output/'nterm-rel-length-change_scatterplot.png', dpi=600, facecolor=None, bbox_inches='tight')
+plt.show()
 
 #Output source data
-### output
-nterm_pblocks.query("nterm in ['Mutually exclusive starts', 'Shared downstream start']")[['anchor','other','nterm','altTSS']].to_csv(output/'nterm-rel-length-change-table.tsv', sep='\t')
+nterm_pblocks.query("nterm in ['Mutually exclusive starts (MSX)', 'Shared downstream start (SDS)']")[['anchor','other','aa_loss','aa_gain']].to_csv(output/'nterm_mechanism_affected_len.tsv', sep='\t')
 
-# %%
-mxs_rel_lengths = nterm_pblocks[nterm_pblocks['nterm'] == 'Mutually exclusive starts']['anchor_relative_length_change'].abs()
-sds_rel_lengths = nterm_pblocks[nterm_pblocks['nterm'] == 'Shared downstream start']['anchor_relative_length_change'].abs()
-mannwhitneyu(mxs_rel_lengths, sds_rel_lengths)
 
-# %%
+

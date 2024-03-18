@@ -1,7 +1,7 @@
 # %% Importing libraries
 from pathlib import Path
 from re import M
-
+import scipy.stats as stats
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -13,7 +13,7 @@ from plot_config import PBLOCK_COLORS, SECTION_COLORS, pblocks
 output = Path('../C_altered_region_summary_plots')
 output.mkdir(exist_ok=True)
 
-# %% Number of altered isoforms per gene vs number of genes
+# %% Fig2 panel A: Number of altered isoforms per gene vs number of genes
 fig = plt.figure(figsize=(4, 2.4))
 bins = list(range(1, 11)) + [100]
 ax = sns.histplot(
@@ -38,7 +38,7 @@ fig.savefig(output/'alternative-isoforms-per-gene.png', dpi=200, facecolor=None,
 ###
 pblocks.groupby('anchor')['other'].nunique().to_frame(name='count').to_csv(output/'alternative-isoforms-per-gene-table.tsv', sep='\t')
 
-# %% Plot: Number of observed pblocks per alternative protein isoforms
+# %% Fig2 panel B: Number of observed pblocks per alternative protein isoforms
 fig = plt.figure(figsize=(4, 2.4))
 ax = sns.histplot(
     x = pd.cut(
@@ -64,7 +64,7 @@ fig.savefig(output/'altered-regions-per-isoform.png', dpi=200, facecolor=None, b
 ### output
 pblocks.groupby(['anchor', 'other']).size().to_frame(name='num_alt_regions').to_csv(output/'altered-regions-per-isoform-table.tsv', sep='\t')
 
-# %% Plot : Distribution of lengths of the insertion, deletion and substituion affected regions for proteins 
+# %% Fig2 panel C: Distribution of lengths of the insertion, deletion and substituion affected regions for proteins 
 aa_loss = pblocks[pblocks['pblock_category'].isin({'DELETION', 'SUBSTITUTION'})].reset_index()[['anchor','other','pblock_category', 'aa_loss']]
 aa_loss['pblock_category'].replace('SUBSTITUTION', 'SUBSTITUTION (reference)', inplace=True)
 aa_loss.rename(columns={'aa_loss': 'length'}, inplace=True)
@@ -100,7 +100,7 @@ fig.savefig(output/'altered-region-affected-lengths.png', dpi=200, facecolor=Non
 ### output
 affected_lengths[affected_lengths['pblock_category'] != 'SUBSTITUTION (alternative)'].to_csv(output/'altered-region-affected-lengths-table.tsv', sep='\t')
 
-# %% Figure 4C
+# %% Fig2 panel D: Distribution of the length of altered protein regions across the annotated proteome
 facets = sns.displot(
     data = affected_lengths,
     x = 'length',
@@ -131,7 +131,30 @@ facets.fig.savefig(output/'altered-region-affected-lengths-categories.png', dpi=
 ### output
 affected_lengths.to_csv(output/'altered-region-affected-lengths-categories-table.tsv', sep='\t')
 
-# %% Plot 3C: Substitution scatter plot 
+# %%
+#  T-test for the means of two independent samples of scores.
+insertion = affected_lengths[affected_lengths['pblock_category'] == 'INSERTION']['length']
+deletion = affected_lengths[affected_lengths['pblock_category'] == 'DELETION']['length']
+substitution_ref = affected_lengths[affected_lengths['pblock_category'] == 'SUBSTITUTION (reference)']['length']
+substitution_alt = affected_lengths[affected_lengths['pblock_category'] == 'SUBSTITUTION (alternative)']['length']
+
+stats.mannwhitneyu(insertion, deletion) #MannwhitneyuResult(statistic=37940405.5, pvalue=0.0)
+stats.mannwhitneyu(insertion, substitution_ref) #MannwhitneyuResult(statistic=20566509.0, pvalue=0.0)
+stats.mannwhitneyu(insertion, substitution_alt) #MannwhitneyuResult(statistic=51275501.0, pvalue=1.1174708861070221e-07)
+
+# Also alternative package
+import pingouin as pg
+pg.mwu(insertion, deletion, alternative='two-sided')
+pg.mwu(insertion, substitution_ref, alternative='two-sided')
+
+# Mann-Whitney U Test in R using stats library
+# wilcox.test(insertion_data$V1, deletion_data$V1, alternative = "two.sided")
+# data:  insertion_data$V1 and deletion_data$V1
+# W = 37940406, p-value < 2.2e-16
+# alternative hypothesis: true location shift is not equal to 0
+
+
+# %% Fig2 panel I =: Substitution scatter plot 
 plt.figure(figsize=(4.8, 3.6))
 ax = sns.histplot(
     data = pblocks[pblocks['pblock_category'] == 'SUBSTITUTION'],
@@ -160,7 +183,7 @@ plt.savefig(output/'substitution-reference-alternative-lengths.png', dpi=200, fa
 ### output
 pblocks.query("pblock_category == 'SUBSTITUTION'")[['anchor', 'other','pblock_category','aa_gain','aa_loss']].to_csv(output/'substitution-reference-alternative-lengths-table.tsv', sep='\t')
 
-# %% Pie chart
+# %% Fig2 panel D: Pie chart
 category_counts = pblocks['pblock_category'].value_counts()
 total_pblocks = category_counts.sum()
 fig, ax = plt.subplots()
@@ -230,4 +253,5 @@ with open(output/'protein-section-counts-table.tsv', 'w', newline='') as file:
     writer.writeheader()
     writer.writerow(SECTION_COLORS)
 
-# %%
+# %% Identifying frameshift cases 
+pblocks[pblocks['cblocks'].str.count('FRAME') > 2]
