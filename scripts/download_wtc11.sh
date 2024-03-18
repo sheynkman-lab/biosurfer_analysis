@@ -11,6 +11,6 @@ echo "================================================================="
 mkdir A_wtc11
 cd A_wtc11
 
-wget https://zenodo.org/record/7297008/files/biosurfer_wtc11_data.zip
+wget https://zenodo.org/records/10822882/files/biosurfer_wtc11_data.zip
 unzip biosurfer_wtc11_data.zip 
 rm -rf __MACOSX biosurfer_wtc11_data.zip
